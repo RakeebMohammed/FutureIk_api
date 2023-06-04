@@ -5,8 +5,11 @@ const {
   Check,
 Update
 } = require("../controller/userController");
-
+const db = require("../model/connection");
 const router = express.Router();
+router.get('/',async(req,res)=>{
+  let result=await db.get().collection('users').find().toArray()
+res.send(result)})
 //route for signup
 router.post("/register", Signup);
 //route for login
