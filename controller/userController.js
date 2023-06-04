@@ -89,37 +89,49 @@ const Login = async (req, res) => {
   }
 };
 const Check = async (req, res) => {
-  const { Email, Phone } = req.body;
-  let result = await db
-    .get()
-    .collection("users")
-    .findOne({ $and: [{ Email: Email, Phone: Phone }] });
+  try {
+    const { Email, Phone } = req.body;
+    let result = await db
+      .get()
+      .collection("users")
+      .findOne({ $and: [{ Email: Email, Phone: Phone }] });
 
-  console.log(result + "hii");
-  if (result) return res.status(200).json({ result: result._id });
-  else return res.status(404).json(false);
+    console.log(result + "hii");
+    if (result) return res.status(200).json({ result: result._id });
+    else return res.status(404).json(false);
+  } catch (e) {
+    // internal error response
+    return res.status(500).json({ error: err.message });
+  }
 };
+
 const Update = async (req, res) => {
-  console.log(req.body);
-  let { Password, Cpassword, Id } = req.body;
- if (Password !== Cpassword) {
-    return res.status(404).json("Password mismatch");
-  }let PasswordRegex = /^[A-Za-z\d]{8,}$/;
-  //check for valid password
-  if (!PasswordRegex.test(Password))
-    return res
-      .status(400)
-      .json("Password Should contain atleast 8 characters");
-  //hashing the password to store in the database
-  Password = await bcrypt.hash(Password, 10);
-  console.log(Password);
-  //storing password to database
- Id = new objectid(Id);
-  await db
-    .get()
-    .collection("users")
-    .updateOne({ _id: Id }, { $set: { Password: Password } })
-    .then(() => res.status(200).json({ result: true }))
-    .catch(() => res.status(400).json("No match"));
+  try {
+    console.log(req.body);
+    let { Password, Cpassword, Id } = req.body;
+    if (Password !== Cpassword) {
+      return res.status(404).json("Password mismatch");
+    }
+    let PasswordRegex = /^[A-Za-z\d]{8,}$/;
+    //check for valid password
+    if (!PasswordRegex.test(Password))
+      return res
+        .status(400)
+        .json("Password Should contain atleast 8 characters");
+    //hashing the password to store in the database
+    Password = await bcrypt.hash(Password, 10);
+    console.log(Password);
+    //storing password to database
+    Id = new objectid(Id);
+    await db
+      .get()
+      .collection("users")
+      .updateOne({ _id: Id }, { $set: { Password: Password } })
+      .then(() => res.status(200).json({ result: true }))
+      .catch(() => res.status(400).json("No match"));
+  } catch (e) {
+    // internal error response
+    return res.status(500).json({ error: err.message });
+  }
 };
 module.exports = { Signup, Check, Login, Update };

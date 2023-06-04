@@ -2,7 +2,7 @@ const mongodb = require("mongodb").MongoClient;
 let state = { db: null };
 module.exports.connect = () => {
   try{
-  let url = "mongodb+srv://rakku:rakkudana@fututeik.vuhmhhh.mongodb.net/";
+  let url = process.env.DATABASE;
   let dbname = "React";
   //connecting to the database
   mongodb.connect(url).then(data=>{
