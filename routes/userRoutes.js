@@ -13,5 +13,5 @@ router.post("/login", Login);
 //route to check email and phone number
 router.post("/forgotPassword", Check);
 //route to update password
-router.post("/updatePassword", Update);
+router.put("/updatePassword", Update);
 module.exports = router;

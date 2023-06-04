@@ -14,6 +14,11 @@ const Signup = async (req, res) => {
     //check for valid Name
     if (!/^[A-Za-z]+$/.test(Name))
       return res.status(404).json("Not a valid Name");
+      //check for valid mobile number
+
+    let PhoneRegex = /^[0-9]{10}$/;
+    if (!PhoneRegex.test(Phone))
+      return res.status(400).json("Phone number not valid");
     let EmailRegex =
       /^[a-zA-Z0-9_.+]*[a-zA-Z][a-zA-Z0-9_.+]*@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
     //validating Email
@@ -24,12 +29,8 @@ const Signup = async (req, res) => {
     if (!PasswordRegex.test(Password))
       return res
         .status(400)
-        .json("Password Should contain atleast 8 characters");
-    //check for valid mobile number
-
-    let PhoneRegex = /^[0-9]{10}$/;
-    if (!PhoneRegex.test(Phone))
-      return res.status(400).json("Phone number not valid");
+        .json("Password should contain atleast 8 characters");
+    
     //check whether both password is same
     if (Password !== Cpassword)
       return res.status(404).json("Password mismatch");
@@ -41,7 +42,7 @@ const Signup = async (req, res) => {
       console.log(EmailExists);
       //check for if the Email exists in the database
       if (EmailExists)
-        return res.status(404).json("Already have Same Email id ");
+        return res.status(404).json("Already have same Email id ");
       //hashing the password to store in the database
       Password = await bcrypt.hash(Password, 10);
       console.log(Password);
@@ -82,7 +83,7 @@ const Login = async (req, res) => {
       console.log(token);
       res.status(200).json({ id: token });
     } else
-      res.status(404).json("Error occured on validating Email and password");
+      res.status(404).json("Incorrect Email or password");
   } catch (err) {
     // internal error response
     return res.status(500).json({ error: err.message });
@@ -98,7 +99,7 @@ const Check = async (req, res) => {
 
     console.log(result + "hii");
     if (result) return res.status(200).json({ result: result._id });
-    else return res.status(404).json(false);
+    else return res.status(404).json('No user found');
   } catch (e) {
     // internal error response
     return res.status(500).json({ error: err.message });
@@ -128,7 +129,7 @@ const Update = async (req, res) => {
       .collection("users")
       .updateOne({ _id: Id }, { $set: { Password: Password } })
       .then(() => res.status(200).json({ result: true }))
-      .catch(() => res.status(400).json("No match"));
+      .catch(() => res.status(400).json("Password not updated"));
   } catch (e) {
     // internal error response
     return res.status(500).json({ error: err.message });
